@@ -1,0 +1,26 @@
+IDENTIFIER            = LETTER, { LETTER | DIGIT | "_" } ;
+NUMBER                = DIGIT, { DIGIT } ;
+LETTER                = ( a | ... | z | A | ... | Z ) ;
+DIGIT                 = ( 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0 ) ;
+BOOL                  = ( "true" | "false" ) ;
+RELATION_SYMBOL       = ( "==" | ">" | ">=" | "<=" | ">=" )
+
+TYPE                  = "int" | "bool" | "eq" ;
+
+BLOCK                 = "BEGIN", "\n", { STATEMENT }, "END" ;
+STATEMENT             = ( λ | DEFINE | ASSIGNMENT | PRINT | WHILE | IF | SHOW | SOLVE), "\n" ;
+BOOL_EXPRESSION       = BOOL_TERM, { "||", BOOL_TERM } ;
+BOOL_TERM             = RELATIONAL_EXPRESSION, { "&&", RELATIONAL_EXPRESSION } ;
+RELATIONAL_EXPRESSION = EXPRESSION, { RELATION_SYMBOL , EXPRESSION } ;
+EXPRESSION            = TERM, { ("+" | "-"), TERM } ;
+TERM                  = FACTOR, { ("*" | "/"), FACTOR } ;
+FACTOR                = NUMBER | IDENTIFIER | BOOL | ( ("+" | "-" | "!"), FACTOR ) | "(", BOOL_EXPRESSION, ")" | "input", "(", ")" ;
+
+DEFINE                = TYPE, IDENTIFIER ;
+ASSIGNMENT            = ( DEFINE | IDENTIFIER ), "=", ( BOOL_EXPRESSION | EXPRESSION ) ;
+PRINT                 = "print", "(", [ BOOL_EXPRESSION ], ")" ;
+
+WHILE                 = "while", " ", BOOL_EXPRESSION, "\n", BLOCK, "\n" ;
+IF                    = "if", " ", BOOL_EXPRESSION, "\n", BLOCK, "\n", { "elif", "\n", BLOCK, "\n" }, [ "else", "\n", BLOCK, "\n" ] ;
+SHOW                  = "show", "(", IDENTIFIER, [ RELATION_SYMBOL, EXPRESSION ], { ",", IDENTIFIER, RELATION_SYMBOL, EXPRESSION }, ")" ;
+SOLVE                 = "solve", "(", IDENTIFIER, RELATION_SYMBOL, EXPRESSION, ",", IDENTIFIER, { ",", IDENTIFIER, RELATION_SYMBOL, EXPRESSION }, ")" ;
