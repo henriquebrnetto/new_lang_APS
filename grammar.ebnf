@@ -19,7 +19,7 @@ FACTOR                = NUMBER | IDENTIFIER | BOOL | ( ("+" | "-" | "!"), FACTOR
 DEFINE                = TYPE, IDENTIFIER ;
 ASSIGNMENT            = ( DEFINE | IDENTIFIER ), "=", BOOL_EXPRESSION ;
 PRINT                 = "print", "(", [ BOOL_EXPRESSION ], ")" ;
-WHILE                 = "while", " ", BOOL_EXPRESSION, "\n", BLOCK, "\n" ;
-IF                    = "if", " ", BOOL_EXPRESSION, "\n", BLOCK, "\n", { "elif", "\n", BLOCK, "\n" }, [ "else", "\n", BLOCK, "\n" ] ;
+WHILE                 = "while", BOOL_EXPRESSION, "\n", BLOCK, "\n" ;
+IF                    = "if", BOOL_EXPRESSION, "\n", BLOCK, "\n", { "elif", "\n", BLOCK, "\n" }, [ "else", "\n", BLOCK, "\n" ] ;
 SHOW                  = "show", "(", IDENTIFIER, [ RELATION_SYMBOL, EXPRESSION ], { ",", IDENTIFIER, RELATION_SYMBOL, EXPRESSION }, ")" ;
 SOLVE                 = "solve", "(", IDENTIFIER, RELATION_SYMBOL, EXPRESSION, ",", IDENTIFIER, { ",", IDENTIFIER, RELATION_SYMBOL, EXPRESSION }, ")" ;
