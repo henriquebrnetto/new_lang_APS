@@ -1,0 +1,75 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "kwarizmi.tab.h"
+
+extern YYSTYPE yylval;
+%}
+
+DIGITO      [0-9]
+LETRA       [a-zA-Z_]
+ID          {LETRA}({LETRA}|{DIGITO})*
+NUMERO      {DIGITO}+
+
+
+%option noyywrap
+%option yylineno
+
+%%
+
+[\t\r ]+                  { /* ignora espaços e tabs */ }
+"//".*                    { /* ignora comentário de linha */ }
+"/"([^]|\+[^/])\+"/"  { /* ignora comentário de bloco */ }
+
+\n                       { return T_NEWLINE; }
+
+/* Palavras-chave */
+"BEGIN"                  { return T_BEGIN; }
+"END"                    { return T_END; }
+"int"                    { return T_INT; }
+"bool"                   { return T_BOOL; }
+"eq"                     { return T_EQTYPE; }
+
+"true"                   { yylval.bval = 1; return T_BOOL_LITERAL; }
+"false"                  { yylval.bval = 0; return T_BOOL_LITERAL; }
+
+"if"                     { return T_IF; }
+"elif"                   { return T_ELIF; }
+"else"                   { return T_ELSE; }
+"while"                  { return T_WHILE; }
+
+"print"                  { return T_PRINT; }
+"show"                   { return T_SHOW; }
+"solve"                  { return T_SOLVE; }
+
+"input"[\t\r ]*\(\)      { return T_INPUT; }
+
+/* Operadores */
+"="                      { return T_ASSIGN; }
+"=="                     { return T_EQ; }
+"!="                     { return T_NEQ; }
+"<="                     { return T_LTE; }
+">="                     { return T_GTE; }
+"<"                      { return T_LT; }
+">"                      { return T_GT; }
+"&&"                     { return T_AND; }
+"||"                     { return T_OR; }
+
+"("                      { return '('; }
+")"                      { return ')'; }
+"+"                      { return '+'; }
+"-"                      { return '-'; }
+""                      { return ''; }
+"/"                      { return '/'; }
+
+/* Literais */
+{NUMERO}                 { yylval.ival = atoi(yytext); return T_INT_LITERAL; }
+
+/* Identificadores */
+{ID}                     { yylval.sval = strdup(yytext); return T_IDENTIFIER; }
+
+/* Erro */
+.                        { fprintf(stderr, "Caractere inesperado na linha %d: '%s'\n", yylineno, yytext); return T_ERROR; }
+
+%%
