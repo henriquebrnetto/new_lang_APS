@@ -1,0 +1,8 @@
+BEGIN
+int x
+int y = input(      )
+eq fxy = x + y
+
+                    print(x)
+solve(fxy == 0, x)
+END

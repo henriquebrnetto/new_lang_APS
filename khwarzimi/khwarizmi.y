@@ -1,3 +1,4 @@
+
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,6 +35,10 @@ void yyerror(const char *s) {
 
 %token T_ERROR
 
+/* Tipos para não-terminais */
+%type <ival> expressao
+%type <ival> argumentos
+
 /* Precedência */
 %left T_OR
 %left T_AND
@@ -47,8 +52,6 @@ void yyerror(const char *s) {
 
 %%
 
-/* Regras de gramática */
-
 programa:
     lista_declaracoes
 ;
@@ -60,13 +63,13 @@ lista_declaracoes:
 
 declaracao:
     T_NEWLINE
-  | T_INT T_IDENTIFIER T_NEWLINE                      { /* declaração sem valor */ }
+  | T_INT T_IDENTIFIER T_NEWLINE
   | T_BOOL T_IDENTIFIER T_NEWLINE
   | T_EQTYPE T_IDENTIFIER T_NEWLINE
-  | T_INT T_IDENTIFIER T_ASSIGN expressao T_NEWLINE   { /* declaração com valor */ }
+  | T_INT T_IDENTIFIER T_ASSIGN expressao T_NEWLINE
   | T_BOOL T_IDENTIFIER T_ASSIGN expressao T_NEWLINE
   | T_EQTYPE T_IDENTIFIER T_ASSIGN expressao T_NEWLINE
-  | T_IDENTIFIER T_ASSIGN expressao T_NEWLINE         { /* reatribuição */ }
+  | T_IDENTIFIER T_ASSIGN expressao T_NEWLINE
   | T_PRINT '(' expressao ')' T_NEWLINE
   | T_SHOW '(' argumentos ')' T_NEWLINE
   | T_SOLVE '(' argumentos ')' T_NEWLINE
@@ -103,29 +106,29 @@ argumentos:
 ;
 
 expressao:
-    T_INT_LITERAL
-  | T_BOOL_LITERAL
-  | T_IDENTIFIER
-  | T_INPUT '(' ')'          { $$ = $1; }
-  | '(' expressao ')'
-  | expressao '+' expressao
-  | expressao '-' expressao
-  | expressao '*' expressao
-  | expressao '/' expressao
-  | expressao T_EQ expressao
-  | expressao T_NEQ expressao
-  | expressao T_LT expressao
-  | expressao T_GT expressao
-  | expressao T_LTE expressao
-  | expressao T_GTE expressao
-  | expressao T_AND expressao
-  | expressao T_OR expressao
-  | '-' expressao %prec UMINUS
+    T_INT_LITERAL                     { $$ = $1; }
+  | T_BOOL_LITERAL                    { $$ = $1; }
+  | T_IDENTIFIER                      { $$ = 0; } // placeholder simbólico
+  | T_INPUT '(' ')'                   { $$ = 0; }
+  | '(' expressao ')'                { $$ = $2; }
+  | expressao '+' expressao          { $$ = $1 + $3; }
+  | expressao '-' expressao          { $$ = $1 - $3; }
+  | expressao '*' expressao          { $$ = $1 * $3; }
+  | expressao '/' expressao          { $$ = $1 / $3; }
+  | expressao T_EQ expressao         { $$ = $1 == $3; }
+  | expressao T_NEQ expressao        { $$ = $1 != $3; }
+  | expressao T_LT expressao         { $$ = $1 < $3; }
+  | expressao T_GT expressao         { $$ = $1 > $3; }
+  | expressao T_LTE expressao        { $$ = $1 <= $3; }
+  | expressao T_GTE expressao        { $$ = $1 >= $3; }
+  | expressao T_AND expressao        { $$ = $1 && $3; }
+  | expressao T_OR expressao         { $$ = $1 || $3; }
+  | '-' expressao %prec UMINUS       { $$ = -$2; }
 ;
 
 %%
 
 int main() {
     printf("Iniciando parsing da linguagem Khwarizmi...\n");
-    return yyparse();
+    return yyparse();
 }
