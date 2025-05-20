@@ -62,8 +62,16 @@ int z = 3
 eq fxy = z + y + x * x
 
 print(z)
-show(fxy, x == 2)
-solve(fxy == 0, x, y == 4)
+show(fxy, x == 2) // mostra gráfico de fxy por y
+
+// solve(fxy == 0, x, y == 1)
+// ^ retornaria erro, uma vez que solve é capaz de resolver apenas
+// funções de primeiro grau com uma variável livre
+
+solve(fxy == 0, y, x == 1) 
+// ^ Neste caso daria certo, uma vez que x está sendo definido
+// constante no input da função
+
 END
 ```
 
@@ -123,11 +131,12 @@ END
 
 ```khwarizmi
 BEGIN
-int x
-int y
-int z = 3
-eq fxy = z + y + x * x
+int x // variável livre
+int y // variável livre
+int z = 3 // valor inteiro
+int resultado = z * z // valor inteiro
+eq fxy = z + (y + y) * x
 
-solve(fxy == 0, x, y == 2)
+solve(fxy == resultado, x, y == 2) // mostra a solução no terminal
 END
 ```
