@@ -105,7 +105,11 @@ class Tokenizer:
                 self.next = Token('LESS', '<')
         
         elif token == '!':
-            self.next = Token('NOT', '!')
+            if self.source[self.pos + 1] == '=':
+                self.pos += 1
+                self.next = Token('NOTEQ', '!=')
+            else:
+                self.next = Token('NOT', '!')
 
         elif token == ':':
             self.next = Token('COLON', ':')

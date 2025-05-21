@@ -54,6 +54,7 @@ NUMERO      {DIGITO}+
 ")"                  { return ')'; }
 "+"                  { return '+'; }
 "-"                  { return '-'; }
+"*"                  { return '*'; }
 "/"                  { return '/'; }
 
 ","                  { return ','; }

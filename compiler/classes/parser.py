@@ -16,7 +16,7 @@ class Parser:
 
     @staticmethod
     def next_is_rel_exp_operator() -> bool:
-        return Parser.tokenizer.next.ttype in ['LESS', 'GREATER', 'EQUALS']
+        return Parser.tokenizer.next.ttype in ['LESS', 'GREATER', 'EQUALS', 'NOTEQ', 'LESSEQ', 'GREATEREQ']
 
     @staticmethod
     def next_is_exp_operator() -> bool:
@@ -326,6 +326,15 @@ class Parser:
             elif tok.next.ttype == 'LESS':
                 tok.select_next()
                 tree = BinOp('<', [tree, Parser.parse_expression()])
+            elif tok.next.ttype == 'NOTEQ':
+                tok.select_next()
+                tree = BinOp('!=', [tree, Parser.parse_expression()])
+            elif tok.next.ttype == 'GREATEREQ':
+                tok.select_next()
+                tree = BinOp('>=', [tree, Parser.parse_expression()])
+            elif tok.next.ttype == 'LESSEQ':
+                tok.select_next()
+                tree = BinOp('<=', [tree, Parser.parse_expression()])
         return tree
 
     @staticmethod
@@ -374,7 +383,7 @@ class Parser:
             tree = UnOp('-', [Parser.parse_factor()])
         elif tok.next.ttype == 'NOT':
             tok.select_next()
-            tree = UnOp('!', [Parser.parse_factor()])   
+            tree = UnOp('!', [Parser.parse_factor()])
         elif Parser.next_is_par('open'):
             tok.select_next()
             tree = Parser.parse_bool_expression()

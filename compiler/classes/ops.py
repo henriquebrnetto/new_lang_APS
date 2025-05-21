@@ -67,21 +67,27 @@ class BinOp(Node):
             return vals[0] > vals[1], 'bool'
         
 
+        if self.value == '>=':
+            if types[0] != types[1]:
+                raise TypeError("Invalid input.")
+            return vals[0] >= vals[1], 'bool'
+        
+
         if self.value == '<':
             if types[0] != types[1]:
                 raise TypeError("Invalid input.")
             return vals[0] < vals[1], 'bool'
-            
         
-        if self.value == '++':
 
-            if types[0] == 'bool':
-                vals = (str(vals[0]).lower(), vals[1])
+        if self.value == '<=':
+            if types[0] != types[1]:
+                raise TypeError("Invalid input.")
+            return vals[0] <= vals[1], 'bool'
 
-            if types[1] == 'bool':
-                vals = (vals[0], str(vals[1]).lower())
-            
-            return "".join([str(vals[0]), str(vals[1])]), 'str'
+        if self.value == '!=':
+            if types[0] != types[1]:
+                raise TypeError("Invalid input.")
+            return vals[0] != vals[1], 'bool'
         
 
 class UnOp(Node):

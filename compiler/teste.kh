@@ -1,4 +1,9 @@
-int x = 3
-eq fx = x + 1
-show(fx)
-solve(fx==0, x)
+{
+    int x = 3
+    int y = 2
+    print(x != y)
+    print(x < y)    // true
+    print(x <= 3)   // true
+    print(y >= 5)   // false
+    print(x == 3)   // true
+}
