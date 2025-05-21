@@ -13,6 +13,5 @@ class Node():
     def collect_identifiers(self) -> List[str]:
         ids = []
         for c in self.children:
-            # assume every Node subclass has collect_identifiers
             ids.extend(c.collect_identifiers())
         return ids

@@ -1,193 +1,156 @@
-from dataclasses import dataclass, field
-from classes.token_ import Token
-import re
+from classes.token_ import Token 
 
-@dataclass
 class Tokenizer:
     source: str
-    pos: int = -1
-    next: Token = field(default_factory=lambda: Token('', ''))
+    pos: int
+    next: Token 
 
-    def __post_init__(self):
-        self.__reserved_kw = {
-            'int':    'INT',
-            'bool':   'BOOL',
-            'eq':     'EQ',
-            'show':   'SHOW',
-            'solve':  'SOLVE',
-            'begin':  'BEGIN',
-            'end':    'END',
-            'elif':   'ELIF',
-            'print':  'PRINTF',
-            'input':  'READER',
-            'true':   'TRUE',
-            'false':  'FALSE'
-        }
-
-    def check_eof(self) -> bool:
-        if self.pos >= len(self.source):
-            return True
-        return False
     
-    def next_is_letter(self, only=False) -> bool:
-        if only:
-            return True if re.match(r'[A-Za-z]', self.source[self.pos]) else False
-        return True if re.match(r'[A-Za-z_]', self.source[self.pos]) else False
+    RESERVED_KEYWORDS = {
+        "BEGIN": "BEGIN_KEYWORD",
+        "END": "END_KEYWORD",
+        "int": "TYPE_INT",
+        "bool": "TYPE_BOOL",
+        "eq": "TYPE_EQ",
+        "if": "IF_KEYWORD",
+        "elif": "ELIF_KEYWORD",
+        "else": "ELSE_KEYWORD",
+        "while": "WHILE_KEYWORD",
+        "print": "PRINT_CMD",
+        "show": "SHOW_CMD",
+        "solve": "SOLVE_CMD",
+        "input": "INPUT_CMD", 
+        "true": "BOOL_LITERAL", 
+        "false": "BOOL_LITERAL", 
+    }
 
-    def skip_spaces(self) -> None:
-        pos = self.pos
-        espaco = False
-        try:
-            while (re.match(r'\s', self.source[pos])):
-                espaco = True
-                pos += 1
-        except IndexError:
-            pass
-        finally:
-            if espaco:
-                pos -= 1
-        self.pos = pos
+    def __init__(self, source: str): 
+        self.source = source
+        self.pos = 0 
+        self.next = None 
+        self.select_next() 
+
 
     def select_next(self) -> None:
-        self.pos += 1
-        if self.pos >= len(self.source):
-            self.pos = len(self.source) - 1
-            self.next = Token('EOF', '')
-            return
-        
-        token = self.source[self.pos]
-        if token == '+':
-            if self.source[self.pos + 1] == '+':
+        """
+        Selects the next token from the source code.
+        Skips whitespace (excluding newlines) and comments.
+        Handles newlines as significant tokens.
+        """
+        while self.pos < len(self.source):
+            char = self.source[self.pos]
+
+            
+            if char == '\n':
+                self.next = Token("NEWLINE", "\n")
                 self.pos += 1
-                self.next = Token('CONCAT', '++')
-            else:
-                self.next = Token('PLUS', '+')
+                return
 
-        elif token == '-':
-            self.next = Token('MINUS', '-')
-
-        elif token == '*':
-            self.next = Token('MULT', '*')
-        
-        elif token == '/':
-            self.next = Token('DIV', '/')
-
-        elif token == '(':
-            self.next = Token('OPEN_PAR', '(')
-        
-        elif token == ')':
-            self.next = Token('CLOSE_PAR', ')')
-
-        elif token == '{':
-            self.next = Token('OPEN_BRACKET', '{')
-        
-        elif token == '}':
-            self.next = Token('CLOSE_BRACKET', '}')
-
-        elif token == ',':
-            self.next = Token('COMMA', ',')
-        
-        elif token == ';':
-            self.next = Token('SEMICOLON', ';')
-
-        elif token == '>':
-            if self.source[self.pos + 1] == '=':
+            if char.isspace(): 
                 self.pos += 1
-                self.next = Token('GREATEREQ', '>=')
-            else:
-                self.next = Token('GREATER', '>')
-        
-        elif token == '<':
-            if self.source[self.pos + 1] == '=':
-                self.pos += 1
-                self.next = Token('LESSEQ', '<=')
-            else:
-                self.next = Token('LESS', '<')
-        
-        elif token == '!':
-            if self.source[self.pos + 1] == '=':
-                self.pos += 1
-                self.next = Token('NOTEQ', '!=')
-            else:
-                self.next = Token('NOT', '!')
+                continue
 
-        elif token == ':':
-            self.next = Token('COLON', ':')
-        
-        elif token == '=':
-            if self.source[self.pos + 1] == '=':
-                self.pos += 1
-                self.next = Token('EQUALS', '==')
-            else:
-                self.next = Token('ASSIGN', '=')
-        
-        elif token == '&':
-            if self.source[self.pos + 1] == '&':
-                self.pos += 1
-                self.next = Token('AND', '&&')
-            else:
-                self.next = Token('INVALID', token)
-
-        elif token == '|':
-            if self.source[self.pos + 1] == '|':
-                self.pos += 1
-                self.next = Token('OR', '||')
-            else:
-                self.next = Token('INVALID', token)
-        
-        elif token == '"':
-            tokens = ''
-
-            self.pos += 1
-            token = self.source[self.pos]
-            while token != '"' and not self.check_eof():
-                tokens += token
-                try:
+            if char == '/' and self.pos + 1 < len(self.source) and self.source[self.pos+1] == '/':
+                self.pos += 2 
+                while self.pos < len(self.source) and self.source[self.pos] != '\n':
                     self.pos += 1
-                    token = self.source[self.pos]
-                except IndexError:
-                    break
+                
+                
+                continue 
+            if self.pos + 1 < len(self.source):
+                two_char_op = self.source[self.pos : self.pos + 2]
+                if two_char_op == "==":
+                    self.next = Token("OPERATOR_EQ", "==")
+                    self.pos += 2
+                    return
+                if two_char_op == "!=":
+                    self.next = Token("OPERATOR_NEQ", "!=")
+                    self.pos += 2
+                    return
+                if two_char_op == "<=":
+                    self.next = Token("OPERATOR_LTE", "<=")
+                    self.pos += 2
+                    return
+                if two_char_op == ">=":
+                    self.next = Token("OPERATOR_GTE", ">=")
+                    self.pos += 2
+                    return
+                if two_char_op == "&&":
+                    self.next = Token("OPERATOR_AND", "&&")
+                    self.pos += 2
+                    return
+                if two_char_op == "||":
+                    self.next = Token("OPERATOR_OR", "||")
+                    self.pos += 2
+                    return
 
-            self.next = Token('STRING', tokens)
-
-        
-        elif self.next_is_letter(only=True):
-            tokens = ''
-            while self.next_is_letter() and not self.check_eof():
-                tokens += self.source[self.pos]
+            
+            if char == '=':
+                self.next = Token("OPERATOR_ASSIGN", "=")
                 self.pos += 1
-            self.pos -= 1
+                return
+            if char == '<':
+                self.next = Token("OPERATOR_LT", "<")
+                self.pos += 1
+                return
+            if char == '>':
+                self.next = Token("OPERATOR_GT", ">")
+                self.pos += 1
+                return
+            if char in ['+', '-', '*', '/']:
+                
+                op_type = ""
+                if char == '+': op_type = "OPERATOR_PLUS"
+                elif char == '-': op_type = "OPERATOR_MINUS"
+                elif char == '*': op_type = "OPERATOR_MULT"
+                elif char == '/': op_type = "OPERATOR_DIV"
+                self.next = Token(op_type, char)
+                self.pos += 1
+                return
+            if char == '(':
+                self.next = Token("LPAREN", "(")
+                self.pos += 1
+                return
+            if char == ')':
+                self.next = Token("RPAREN", ")")
+                self.pos += 1
+                return
+            if char == ',':
+                self.next = Token("COMMA", ",")
+                self.pos += 1
+                return
 
-            if tokens in self.__reserved_kw:
-                tok_type = self.__reserved_kw[tokens]
-            else:
-                tok_type = 'IDENTIFIER'
-
-            self.next = Token(tok_type, tokens)
-
-
-        elif token == ' ':
-            self.skip_spaces()
-            self.select_next()
-        
-
-        elif token == '\n':
-            self.skip_spaces()
-            self.select_next()
-
-
-        elif token.isdigit():
-            tokens = ''
-
-            while token.isdigit() and not self.check_eof():
-                tokens += token
-                try:
+            
+            if char.isdigit():
+                num_str = ""
+                start_pos = self.pos
+                while self.pos < len(self.source) and self.source[self.pos].isdigit():
+                    num_str += self.source[self.pos]
                     self.pos += 1
-                    token = self.source[self.pos]
-                except IndexError:
-                    break
-            self.pos -= 1
-            self.next = Token('INT', int(tokens))
+                self.next = Token("INT_LITERAL", int(num_str))
+                return
 
-        else:
-            self.next = Token('INVALID', token)
+            
+            if char.isalpha() or char == '_': 
+                ident_str = ""
+                start_pos = self.pos
+                while self.pos < len(self.source) and \
+                      (self.source[self.pos].isalnum() or self.source[self.pos] == '_'):
+                    ident_str += self.source[self.pos]
+                    self.pos += 1
+
+                token_type = Tokenizer.RESERVED_KEYWORDS.get(ident_str)
+                if token_type:
+                    if token_type == "BOOL_LITERAL":
+                        self.next = Token(token_type, True if ident_str == "true" else False)
+                    else:
+                        self.next = Token(token_type, ident_str) 
+                else:
+                    self.next = Token("IDENTIFIER", ident_str)
+                return
+
+            
+            raise ValueError(f"Lexical Error: Unexpected character '{char}' at position {self.pos}")
+
+        
+        self.next = Token("EOF", "") 
