@@ -1,0 +1,4 @@
+int x = 3
+eq fx = x + 1
+show(fx)
+solve(fx==0, x)
