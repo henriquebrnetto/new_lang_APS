@@ -1,0 +1,131 @@
+// Khwarizmi Comprehensive Test Suite
+BEGIN
+
+    // print(--- Section 1: Basic Declarations, Assignments, Print, Input ---)
+    int initialVal
+    // print(initialVal) // Should print default (0)
+
+    initialVal = input() // User enters an integer, e.g., 5
+    print(initialVal)
+
+    bool flag1 = true
+    bool flag2
+    flag2 = false
+    print(flag1)
+    print(flag2)
+
+    eq simpleEq = initialVal * x + 10 // x is symbolic
+    print(simpleEq) // Should print object representation like <Equation: simpleEq>
+
+    // print(--- Section 2: Expressions ---)
+    int a = 10
+    int b = 3
+    int c
+    c = (a + b) * 2 - a / b // (10+3)*2 - 10/3 = 13*2 - 3 = 26 - 3 = 23
+    print(c)
+
+    bool cond1 = a > b && flag1 // true && true -> true
+    print(cond1)
+    bool cond2 = (c == 23) || flag2 // true || false -> true
+    print(cond2)
+    bool cond3 = !(a == b) // !(false) -> true
+    print(cond3)
+    // Note: Khwarizmi does not have unary '!' for NOT, it uses '!=' for inequality.
+    // The above cond3 is more like a pseudo-code for testing.
+    // Let's test inequality directly:
+    bool cond4 = a != b // true
+    print(cond4)
+
+
+    // print(--- Section 3: If / Elif / Else ---)
+    int testNum = input() // User enters an integer
+
+    if testNum < 0
+    BEGIN
+        print(-1)
+    END
+    elif testNum == 0
+    BEGIN
+        print(0)
+    END
+    elif testNum > 0 && testNum < 10
+    BEGIN
+        print(1)
+        int innerIfVar = testNum * 2
+        print(innerIfVar)
+    END
+    else
+    BEGIN
+        print(10)
+        bool isLarge = true
+        print(isLarge)
+    END
+    // print(innerIfVar) // Should cause NameError: innerIfVar not in this scope
+    // print(isLarge)    // Should cause NameError: isLarge not in this scope
+
+
+    // print(4)
+    int counter = 0
+    int limit = input() // User enters loop limit, e.g., 3
+
+    while counter < limit
+    BEGIN
+        // print(Counter:)
+        print(counter)
+        int loopVar = counter * 100 // Scoped to while block iteration
+        print(loopVar)
+        counter = counter + 1
+    END
+    // print(Loop finished. Counter is:)
+    print(counter)
+    // print(loopVar) // Should cause NameError: loopVar not in this scope
+
+
+    // print(--- Section 5: Show Command ---)
+    // Using 'simpleEq' from earlier: initialVal * x + 10
+    // Assuming initialVal was 5 from input: eq simpleEq = 5 * x + 10
+
+    // print(Showing simpleEq (2 free vars: x, initialVal - if initialVal was not set before eq def))
+    // If initialVal was set, then only x is free.
+    // Let's assume initialVal has its value from input()
+    show(simpleEq) // Output depends on free vars. If initialVal=5, shows "simpleEq = (5 * x + 10)"
+
+    // print(Showing simpleEq with x = 3)
+    // 5 * 3 + 10 = 15 + 10 = 25. One free var (initialVal) if it wasn't set, or 0 free vars.
+    // If 0 free vars (initialVal is known): "Nothing to show"
+    // If 1 free var (initialVal is free): "simpleEq = (initialVal * 3) + 10" (or simplified if initialVal is known for display)
+    // Based on your rules, if initialVal is known, and x is subbed, 0 free vars => "Nothing to show"
+    // Let's test with a new equation where free vars are clearer.
+    
+    int s_a = input() // e.g., 2
+    int s_b = input() // e.g., 3
+    int s_c // free symbolic variable
+    eq showEq = s_a * s_c + s_b // e.g., 2 * s_c + 3
+
+    //print(Showing showEq - 1 free var s_c - should print equation for it)
+    show(showEq) // Expected: "showEq = ((2 * s_c) + 3)" (assuming s_a=2, s_b=3)
+
+    //print(Showing showEq with s_c = 5 - 0 free vars)
+    show(showEq, s_c == 5) // Expected: "Nothing to show"
+
+    //print(Showing expression showEq == 13 - 1 free var s_c)
+    // (2 * s_c + 3) == 13
+    show(showEq == 13) // Expected: "(((2 * s_c) + 3) == 13)"
+
+    //print(Showing expression showEq == 13 with s_c = 5 - 0 free vars, evaluates to bool)
+    // (2 * 5 + 3) == 13  => (10 + 3) == 13 => 13 == 13 => true
+    show(showEq == 13, s_c == 5) // Expected: "true"
+    
+    //print(Showing expression showEq < 10 with s_c = 1 - 0 free vars, evaluates to bool)
+    // (2 * 1 + 3) < 10 => 5 < 10 => true
+    show(showEq < 10, s_c == 1) // Expected: "true"
+
+    int free_s1
+    int free_s2
+    int free_s3
+    eq tooManyFree = free_s1 + free_s2 + free_s3
+    //print(Showing tooManyFree - 3 free vars - should error for show)
+    // show(tooManyFree) // This should cause a runtime error as per dimensionality rule
+
+    // print(--- All Tests Complete ---)
+END

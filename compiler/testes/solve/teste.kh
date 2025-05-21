@@ -1,0 +1,16 @@
+// Test snippet for collect_identifiers
+BEGIN
+
+    int valA = 4
+    int valB
+    valB = (valA / 2) + 2 // Uses valA multiple times
+
+    int freeX // Symbolic for the equation
+    int freeY // Symbolic for the equation
+    eq myEquation = (valA * freeX) + (valB * freeY) + 8
+    solve(myEquation == 0, freeX, freeY == 1)
+    show(myEquation, freeX == 3)
+    // The expression inside print will also be an AST part
+    print(valB - freeX + constVal) // Assume constVal is symbolic here for testing
+
+END

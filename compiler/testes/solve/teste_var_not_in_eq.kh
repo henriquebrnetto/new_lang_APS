@@ -1,0 +1,14 @@
+// Test 9: Error - Variable to solve for not in equation
+BEGIN
+    int y
+    eq myEq9 = 2 * y + 5
+    
+    // print(--- Test Error: Var Not In Equation ---)
+    // Solve 2*y + 5 == 15, for 'x'. 'x' is not in the equation.
+    // This should result in coeff_x = 0, const = (2y+5) - 15.
+    // If y has no value, it's "too many free vars".
+    // If y has a value, e.g. y=1, then const = (2+5)-15 = 7-15 = -8.
+    // So, 0*x - 8 = 0 => -8 = 0 => No solution.
+    y = 1 
+    solve(myEq9 == 15, x)
+END

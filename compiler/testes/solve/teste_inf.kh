@@ -1,0 +1,20 @@
+// Test 5: Infinite solutions
+BEGIN
+    int x
+    eq myEq5 = 2 * x + 5
+    
+    // print(--- Test Infinite Solutions ---)
+    // To get 0 = 0:
+    // Let eq myEq5 = 2*x + 5
+    // solve(myEq5 == 2*x + 5, x)  => (2*x+5) - (2*x+5) = 0 => 0 = 0
+    // The parser for solve expects `eqName == integer_value`.
+    // So, we need a case where coeff_x is 0 and const_term is 0.
+    
+    int c1 = 7
+    eq anotherFixedEq = c1 // Represents the equation "7"
+
+    // solve(anotherFixedEq == c1, x) means solve 7 == 7 for x.
+    // Effective equation: 7 - 7 = 0 => 0 = 0.
+    // Coeff_x = 0, Const_term = 0.
+    solve(anotherFixedEq == c1, x)
+END

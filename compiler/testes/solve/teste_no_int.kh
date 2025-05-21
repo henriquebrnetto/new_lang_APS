@@ -1,0 +1,9 @@
+// Test 6: No integer solution
+BEGIN
+    int x
+    eq myEq6 = 2 * x
+    
+    // print(--- Test No Integer Solution ---)
+    // 2*x == 5 => x == 2.5
+    solve(myEq6 == 5, x)
+END

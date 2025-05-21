@@ -1,0 +1,12 @@
+// Test 3: Equation with substitutions in solve
+BEGIN
+    int x 
+    int a 
+    int b
+    eq myEq3 = a * x + b
+
+    // print(--- Test OK 3: Solve with Substitutions ---)
+    // Solve a*x + b == 30, for x, with a=5, b=10
+    // 5*x + 10 == 30 => 5*x == 20 => x == 4
+    solve(myEq3 == 30, x, a == 5, b == 10)
+END

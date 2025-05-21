@@ -34,10 +34,8 @@ def main() -> None:
         sys.exit(1)
     global_symbol_table = SymbolTable(parent=None) 
 
-    print("\n-- Interpreting (Evaluating) --")
     try:
         ast_root.evaluate(global_symbol_table)
-        print("\n-- Execution Finished --")
     except Exception as e: 
         print(f"\n!! RUNTIME ERROR !!")
         print(f"Error Type: {type(e).__name__}")

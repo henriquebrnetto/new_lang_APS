@@ -1,0 +1,8 @@
+// Test 7: Error - Equation not linear
+BEGIN
+    int x
+    eq myEq7 = x * x + 2 // Quadratic in x
+    
+    // print(--- Test Error: Not Linear ---)
+    solve(myEq7 == 11, x) 
+END

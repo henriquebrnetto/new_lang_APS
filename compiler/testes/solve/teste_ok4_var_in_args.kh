@@ -1,0 +1,16 @@
+// Test 10: Using declared variables in solve arguments
+BEGIN
+    int target = 26
+    int sub_a = 4
+    int sub_b = 2
+    
+    int x
+    int a // Will be substituted
+    int b // Will be substituted
+    eq myEq10 = a * x + b
+
+    // print(--- Test OK 4: Variables in Solve Args ---)
+    // Solve (sub_a)*x + (sub_b) == target
+    // 4*x + 2 == 26 => 4*x == 24 => x == 6
+    solve(myEq10 == target, x, a == sub_a, b == sub_b)
+END

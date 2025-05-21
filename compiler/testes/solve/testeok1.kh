@@ -1,0 +1,9 @@
+// Test 1: Simple linear equation
+BEGIN
+    int x
+    eq myEq1 = 2 * x + 4
+    
+    //print(--- Test OK 1: Simple Solve ---)
+    // 2*x + 4 == 10  => 2*x == 6 => x == 3
+    solve(myEq1 == 10, x) 
+END

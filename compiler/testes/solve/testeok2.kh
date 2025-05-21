@@ -1,0 +1,16 @@
+// Test 2: Equation with declared coefficients
+BEGIN
+    int a = 3
+    int b = 5
+    int c = 20
+    int y
+    eq myEq2 = a * y - b
+    
+    // print(--- Test OK 2: Declared Coefficients ---)
+    // 3*y - 5 == c  (where c is 20)
+    // 3*y - 5 == 20 => 3*y == 25 => No integer solution
+    // Let's change c to make it solvable with integers: c = 10
+    // 3*y - 5 == 10 => 3*y == 15 => y == 5
+    c = 10
+    solve(myEq2 == c, y)
+END

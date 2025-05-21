@@ -152,8 +152,10 @@ class Parser:
     def parse_if_statement(self) -> IfNode:
         self.consume("IF_KEYWORD")
         condition_expr = self.parse_expression()
-        self.consume_optional_newlines() 
+        self.consume_optional_newlines()
+        # first IF block
         if_block = self.parse_block()
+        self.consume_optional_newlines()
         
         elif_clauses = []
         while self.tokenizer.next.ttype == "ELIF_KEYWORD":
@@ -162,10 +164,12 @@ class Parser:
             self.consume_optional_newlines()
             elif_block = self.parse_block()
             elif_clauses.append(ElifNode(condition=elif_condition_expr, block=elif_block))
+            self.consume_optional_newlines()
 
         else_block_node = None
         if self.tokenizer.next.ttype == "ELSE_KEYWORD":
             self.consume("ELSE_KEYWORD")
+            self.consume_optional_newlines()
             self.consume_optional_newlines()
             else_block_node = self.parse_block()
             
@@ -218,7 +222,6 @@ class Parser:
         while True:
             op_token = self.tokenizer.next
             op_type = op_token.ttype
-
             
             if op_type not in self.precedence or self.precedence[op_type] < min_precedence:
                 break
@@ -244,10 +247,12 @@ class Parser:
         if token.ttype == "OPERATOR_MINUS": 
             self.consume("OPERATOR_MINUS")
             
-            
             operand = self.parse_factor() 
             return UnOpNode(value="-", children=[operand])
-        
+        elif token.ttype == "OPERATOR_LOGICAL_NOT":
+            self.consume("OPERATOR_LOGICAL_NOT")
+            operand = self.parse_factor()
+            return UnOpNode(value="!", children=[operand])
         elif token.ttype == "INT_LITERAL":
             self.consume("INT_LITERAL")
             return IntLiteralNode(token.value)
@@ -278,7 +283,7 @@ class Parser:
         except Exception as e:
             print(f"Error during preprocessing: {e}")
             sys.exit(1)
-        tokenizer = Tokenizer(code)
+        tokenizer = Tokenizer(processed_code)
         parser = Parser(tokenizer)
         program_ast = parser.parse_program()
         

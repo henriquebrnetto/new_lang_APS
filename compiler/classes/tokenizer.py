@@ -5,7 +5,6 @@ class Tokenizer:
     pos: int
     next: Token 
 
-    
     RESERVED_KEYWORDS = {
         "BEGIN": "BEGIN_KEYWORD",
         "END": "END_KEYWORD",
@@ -32,15 +31,9 @@ class Tokenizer:
 
 
     def select_next(self) -> None:
-        """
-        Selects the next token from the source code.
-        Skips whitespace (excluding newlines) and comments.
-        Handles newlines as significant tokens.
-        """
         while self.pos < len(self.source):
             char = self.source[self.pos]
 
-            
             if char == '\n':
                 self.next = Token("NEWLINE", "\n")
                 self.pos += 1
@@ -54,16 +47,15 @@ class Tokenizer:
                 self.pos += 2 
                 while self.pos < len(self.source) and self.source[self.pos] != '\n':
                     self.pos += 1
-                
-                
                 continue 
+            
             if self.pos + 1 < len(self.source):
                 two_char_op = self.source[self.pos : self.pos + 2]
                 if two_char_op == "==":
                     self.next = Token("OPERATOR_EQ", "==")
                     self.pos += 2
                     return
-                if two_char_op == "!=":
+                if two_char_op == "!=": # This is NOT EQUAL comparison
                     self.next = Token("OPERATOR_NEQ", "!=")
                     self.pos += 2
                     return
@@ -84,9 +76,13 @@ class Tokenizer:
                     self.pos += 2
                     return
 
-            
-            if char == '=':
+            # Single-character operators and delimiters
+            if char == '=': # This is ASSIGNMENT
                 self.next = Token("OPERATOR_ASSIGN", "=")
+                self.pos += 1
+                return
+            if char == '!': # <<< NEW: Logical NOT operator
+                self.next = Token("OPERATOR_LOGICAL_NOT", "!")
                 self.pos += 1
                 return
             if char == '<':
@@ -98,10 +94,9 @@ class Tokenizer:
                 self.pos += 1
                 return
             if char in ['+', '-', '*', '/']:
-                
                 op_type = ""
                 if char == '+': op_type = "OPERATOR_PLUS"
-                elif char == '-': op_type = "OPERATOR_MINUS"
+                elif char == '-': op_type = "OPERATOR_MINUS" # Could be unary or binary
                 elif char == '*': op_type = "OPERATOR_MULT"
                 elif char == '/': op_type = "OPERATOR_DIV"
                 self.next = Token(op_type, char)
@@ -119,26 +114,21 @@ class Tokenizer:
                 self.next = Token("COMMA", ",")
                 self.pos += 1
                 return
-
             
             if char.isdigit():
                 num_str = ""
-                start_pos = self.pos
                 while self.pos < len(self.source) and self.source[self.pos].isdigit():
                     num_str += self.source[self.pos]
                     self.pos += 1
                 self.next = Token("INT_LITERAL", int(num_str))
                 return
-
             
             if char.isalpha() or char == '_': 
                 ident_str = ""
-                start_pos = self.pos
                 while self.pos < len(self.source) and \
                       (self.source[self.pos].isalnum() or self.source[self.pos] == '_'):
                     ident_str += self.source[self.pos]
                     self.pos += 1
-
                 token_type = Tokenizer.RESERVED_KEYWORDS.get(ident_str)
                 if token_type:
                     if token_type == "BOOL_LITERAL":
@@ -148,9 +138,7 @@ class Tokenizer:
                 else:
                     self.next = Token("IDENTIFIER", ident_str)
                 return
-
             
             raise ValueError(f"Lexical Error: Unexpected character '{char}' at position {self.pos}")
 
-        
         self.next = Token("EOF", "") 

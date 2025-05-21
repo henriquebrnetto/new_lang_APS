@@ -1,0 +1,111 @@
+// Khwarizmi Test Suite: Show Command
+BEGIN
+// --- Section 1: Basic 'show(eqName)' ---
+// print(--- Section 1: Basic 'show(eqName)' ---) // Cannot print strings
+
+    int a = 2
+    int b = 3
+    int x // Free symbolic variable
+    int y // Free symbolic variable
+    int z = 10 // Concrete value
+
+    eq eq1 = a * x + b * y // 2 free vars (x, y), a and b will be looked up
+    // print(Test 1.1: Show eq1 (a=2, b=3, x,y free))
+    // Expected: eq1 = ((2 * x) + (3 * y))
+    show(eq1)
+
+    eq eq2 = a * x + z // 1 free var (x), a and z will be looked up
+    // print(Test 1.2: Show eq2 (a=2, z=10, x free))
+    // Expected: eq2 = ((2 * x) + 10)
+    show(eq2)
+
+    eq eq3 = a + b - z // 0 free vars (all concrete)
+    // print(Test 1.3: Show eq3 (a=2, b=3, z=10 -> results in -5))
+    // Expected: Nothing to show (or eq3 = -5 if we change the 0-free-var rule for show(eqName))
+    // Based on our rule "0 free variables: Output 'Nothing to show'", this is the expectation.
+    show(eq3)
+
+
+// --- Section 2: 'show(eqName, substitutions...)' ---
+// print(--- Section 2: 'show(eqName, substitutions...)' ---)
+    // Using eq1 = (2*x) + (3*y)
+    // print(Test 2.1: Show eq1 with x=5 (1 free var: y))
+    // Expected: eq1 = ((2 * 5) + (3 * y))  which is (10 + (3*y))
+    show(eq1, x == 5)
+
+    // print(Test 2.2: Show eq1 with x=1, y=2 (0 free vars))
+    // Expected: Nothing to show
+    show(eq1, x == 1, y == 2)
+    
+    int subVal = 4
+    // print(Test 2.3: Show eq1 with x=subVal (1 free var: y), subVal=4)
+    // Expected: eq1 = ((2 * 4) + (3 * y)) which is (8 + (3*y))
+    show(eq1, x == subVal)
+
+
+// --- Section 3: 'show(eqName <op> integer_value, ...)' ---
+// print(--- Section 3: 'show(eqName <op> integer_value, ...)' ---)
+    // Using eq1 = (2*x) + (3*y)
+    // print(Test 3.1: Show eq1 == 20 (2 free vars: x,y))
+    // Expected: (((2 * x) + (3 * y)) == 20)
+    show(eq1 == 20)
+
+    // print(Test 3.2: Show eq1 == 20, with x=1 (1 free var: y))
+    // (2*1 + 3*y) == 20  => (2 + (3*y)) == 20
+    // Expected: ((2 + (3 * y)) == 20)
+    show(eq1 == 20, x == 1)
+
+    // print(Test 3.3: Show eq1 > z, with x=1, y=1 (0 free vars))
+    // eq1 becomes (2*1 + 3*1) = 5. z is 10.
+    // Expression is 5 > 10, which is false.
+    // Expected: false
+    show(eq1 > z, x == 1, y == 1)
+    
+    // print(Test 3.4: Show eq1 == 11, with x=1, y=3 (0 free vars))
+    // eq1 becomes (2*1 + 3*3) = 2 + 9 = 11.
+    // Expression is 11 == 11, which is true.
+    // Expected: true
+    show(eq1 == 11, x == 1, y == 3)
+
+
+// --- Section 4: 'show' with arbitrary symbolic expression ---
+// print(--- Section 4: 'show' with arbitrary symbolic expression ---)
+    // print(Test 4.1: Show x + y - 7 (2 free vars))
+    // Expected: (((x + y) - 7))
+    show(x + y - 7)
+
+    // print(Test 4.2: Show x + y - z with z=10 (2 free vars x,y))
+    // Expected: (((x + y) - 10))
+    show(x + y - z, z == 10) 
+
+    // print(Test 4.3: Show x + y - z with x=1, y=a (a=2 from program scope), z=10 - 0 free vars)
+    // (1 + 2 - 10) = -7. This is not a comparison.
+    // Expected: Nothing to show
+    show(x + y - z, x == 1, y == a, z == 10) 
+
+
+// --- Section 5: Error Cases for 'show' ---
+// print(--- Section 5: Error Cases for 'show' ---)
+    int free_s1
+    int free_s2
+    int free_s3
+    eq tooManyFree = free_s1 + free_s2 + free_s3
+    // print(Test 5.1: Show tooManyFree (3 free vars))
+    // Expected: Runtime Error: Too many free variables for show()...
+    // show(tooManyFree) // Uncomment to test
+
+    // print(Test 5.2: Show eq1 with invalid substitution format)
+    // Expected: Runtime Error: Invalid substitution format...
+    // show(eq1, x + 1) // Uncomment to test
+
+    // print(Test 5.3: Show eq1 with substitution for var not in equation)
+    int nonExistentVar = 100
+    // show(eq1, nonExistentVar == 5) // Expected: eq1 = ((2 * x) + (3 * y)) (nonExistentVar ignored, or error if strict)
+                                   // Current substitute_ast ignores. A stricter check could be in ShowCmdNode.
+
+    // print(Test 5.4: First argument not an equation or comparison)
+    // Expected: Runtime Error: First argument to show() must be an equation variable, an equation comparison, or a symbolic expression.
+    // show(a + b) // a+b evaluates to an int if a,b are concrete.
+    // show(a + b, x == 1) // Uncomment to test
+
+END
